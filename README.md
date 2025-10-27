@@ -47,12 +47,8 @@ This is a web-based application that identifies the **sports person** in an uplo
 
 ## 📸 Screenshot
 
-You can view the project UI screenshot here 👇  
 [![Screenshot](https://github.com/ani47kat/SPORTS-PERSON-CLASSIFIER/main/screenshot.png)](https://raw.githubusercontent.com/ani47kat/SPORTS-PERSON-CLASSIFIER/main/screenshot.png)
 
-> 🖼️ *Click the image above to view full-size screenshot.*
-
----
 
 ## 🚀 Usage
 
