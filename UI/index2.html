@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Person Classifier</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://img.freepik.com/free-photo/sports-tools_53876-138077.jpg') no-repeat center center/cover;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff7b00;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 30px;
+      font-size: 1.1em;
+    }
+
+    .upload-area {
+      border: 3px dashed #ff7b00;
+      border-radius: 15px;
+      padding: 50px;
+      text-align: center;
+      background: #fff7f0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .upload-area:hover {
+      border-color: #ff4e00;
+      background: #fff0e0;
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 4em;
+      color: #ff7b00;
+      margin-bottom: 20px;
+    }
+
+    .upload-text {
+      color: #444;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .upload-subtext {
+      color: #888;
+      font-size: 0.9em;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #ff7b00 0%, #ff4e00 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 126, 0, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .preview-section {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    .results {
+      background: #fff7f0;
+      border-radius: 15px;
+      padding: 25px;
+      margin-top: 20px;
+    }
+
+    .result-title {
+      font-size: 1.5em;
+      color: #ff7b00;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .result-item {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      font-size: 1.3em;
+      border-left: 5px solid #ff7b00;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .result-item:hover {
+      transform: scale(1.02);
+      border-left-color: #ff4e00;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      display: none;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #ff7b00;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #fee;
+      color: #c33;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      display: none;
+      border-left: 4px solid #c33;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏅 Sports Person Classifier</h1>
+    <p class="subtitle">Upload an image to identify the sportsperson!</p>
+
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📸</div>
+      <div class="upload-text">Drag & Drop your image here</div>
+      <div class="upload-subtext">or click to browse</div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Analyzing image...</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="preview-section" id="previewSection">
+      <img id="previewImage" class="preview-image" alt="Preview">
+      
+      <div class="action-buttons">
+        <button class="btn" id="classifyBtn">🔍 Classify Image</button>
+        <button class="btn btn-secondary" id="resetBtn">🔄 Upload New</button>
+      </div>
+
+      <div class="results" id="results" style="display: none;">
+        <h3 class="result-title">🏆 Sportsperson Predicted</h3>
+        <div id="resultsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000/classify_image";
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const previewSection = document.getElementById('previewSection');
+    const previewImage = document.getElementById('previewImage');
+    const classifyBtn = document.getElementById('classifyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const results = document.getElementById('results');
+    const resultsList = document.getElementById('resultsList');
+
+    let imageBase64 = null;
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          imageBase64 = event.target.result;
+          previewImage.src = imageBase64;
+          previewSection.style.display = 'block';
+          results.style.display = 'none';
+          error.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        showError('Please select a valid image file');
+      }
+    });
+
+    classifyBtn.addEventListener('click', async () => {
+      if (!imageBase64) {
+        showError('Please select an image first');
+        return;
+      }
+
+      loading.style.display = 'block';
+      results.style.display = 'none';
+      error.style.display = 'none';
+      classifyBtn.disabled = true;
+
+      try {
+        const formData = new FormData();
+        formData.append('image_data', imageBase64);
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+        const data = await response.json();
+        displayResults(data);
+      } catch (err) {
+        showError('Classification failed: ' + err.message + '. Make sure the Flask server is running.');
+      } finally {
+        loading.style.display = 'none';
+        classifyBtn.disabled = false;
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      imageBase64 = null;
+      previewSection.style.display = 'none';
+      results.style.display = 'none';
+      error.style.display = 'none';
+    });
+
+    function displayResults(data) {
+      if (!data || !data[0] || data[0].error) {
+        showError(data[0]?.error || 'No face detected. Try another image.');
+        return;
+      }
+
+      const celeb = data[0].class;
+      resultsList.innerHTML = `
+        <div class="result-item">
+          🏅 ${celeb}
+        </div>
+      `;
+      results.style.display = 'block';
+    }
+
+    function showError(message) {
+      error.textContent = '⚠️ ' + message;
+      error.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+
